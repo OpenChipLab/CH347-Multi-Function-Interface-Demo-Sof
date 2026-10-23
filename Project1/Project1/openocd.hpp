@@ -1,0 +1,392 @@
+#include "Pipe.hpp"
+#include <string>
+
+class OPENOCD : public Pipe
+{
+public:
+    OPENOCD() {};
+    ~OPENOCD() {};
+
+    void StartThreadProc() {
+        std::replace(download_file.begin(), download_file.end(), '\\', '/');
+        std::string program_cmd = "program " + download_file;
+        if (download_file.length() >= 4) {
+            std::string ext = download_file.substr(download_file.length() - 4);
+            if (ext == ".bin" || ext == ".BIN") {
+                program_cmd += " verify flash " + start_address;
+            }
+        }
+        cmd_line = ".\\OpenOCD_CH347\\bin\\openocd.exe "
+            "-s .\\OpenOCD_CH347\\scripts "
+            "-f .\\OpenOCD_CH347\\bin\\ch347.cfg "
+            "-c \"transport select " + transport_select + "\" "
+            "-c \"adapter speed " + ((transport_select == "swd")?std::to_string(swd_speed[selected_speed_index]):std::to_string(jtag_speed[selected_speed_index])) + "\" "
+            "-f target\\" + target_cfg +
+            " -c \"init\" "
+            "-c \"halt\" "
+            "-c \"" + program_cmd + "\" "
+            "-c \"reset run\" " + 
+            "-c \"exit\"";
+        Pipe::StartThreadProc();
+    }
+
+public:
+    std::mutex mtx;
+    char device_index[8] = "0";
+    int selected_speed_index = 3;
+    std::string target_cfg;
+    std::string download_file;
+    std::string transport_select = "swd";
+    std::string start_address = "0x08000000";
+
+    const char* swd_speed_items[5] = {
+        "125KHZ",    // 速度4
+        "250KHZ",     // 速度3
+        "500KHZ",      // 速度2
+        "1MHZ",      // 速度1
+        "5MHZ"       // 速度0
+    };
+    const int swd_speed[5] = {
+        125,    
+        250,    
+        500,    
+        1000,   
+        5000     
+    };
+    const char* jtag_speed_items[8] = {
+        "468.75KHZ",  // 速度0
+        "937.5KHZ",   // 速度1
+        "1.875MHZ",   // 速度2
+        "3.75MHZ",    // 速度3
+        "7.5MHZ",     // 速度4
+        "15MHZ",      // 速度5
+        "30MHZ",      // 速度6
+        "60MHZ"       // 速度7
+    };
+    const int jtag_speed[8] = {
+        468,      // 468.75 KHz = 468.75 * 1000 = 468,750 Hz
+        937,      // 937.5  KHz = 937.5  * 1000 = 937,500 Hz
+        1875,     // 1.875  MHz = 1.875  * 1e6  = 1,875,000 Hz
+        3750,     // 3.75   MHz = 3.75   * 1e6  = 3,750,000 Hz
+        7500,     // 7.5    MHz = 7.5    * 1e6  = 7,500,000 Hz
+        15000,    // 15     MHz = 15     * 1e6  = 15,000,000 Hz
+        30000,    // 30     MHz = 30     * 1e6  = 30,000,000 Hz
+        60000     // 60     MHz = 60     * 1e6  = 60,000,000 Hz  
+    };
+
+    const std::vector<std::string> all_targets = {
+        "1986be1.cfg",
+        "adsp-sc58x.cfg",
+        "aduc702x.cfg",
+        "aducm360.cfg",
+        "allwinner_v3s.cfg",
+        "alphascale_asm9260t.cfg",
+        "altera_fpgasoc.cfg",
+        "altera_fpgasoc_arria10.cfg",
+        "am335x.cfg",
+        "am437x.cfg",
+        "amdm37x.cfg",
+        "ampere_emag.cfg",
+        "ampere_qs_mq.cfg",
+        "ar71xx.cfg",
+        "armada370.cfg",
+        "arm_corelink_sse200.cfg",
+        "at32ap7000.cfg",
+        "at91r40008.cfg",
+        "at91rm9200.cfg",
+        "at91sam3ax_4x.cfg",
+        "at91sam3ax_8x.cfg",
+        "at91sam3ax_xx.cfg",
+        "at91sam3nXX.cfg",
+        "at91sam3sXX.cfg",
+        "at91sam3u1c.cfg",
+        "at91sam3u1e.cfg",
+        "at91sam3u2c.cfg",
+        "at91sam3u2e.cfg",
+        "at91sam3u4c.cfg",
+        "at91sam3u4e.cfg",
+        "at91sam3uxx.cfg",
+        "at91sam3XXX.cfg",
+        "at91sam4c32x.cfg",
+        "at91sam4cXXX.cfg",
+        "at91sam4lXX.cfg",
+        "at91sam4sd32x.cfg",
+        "at91sam4sXX.cfg",
+        "at91sam4XXX.cfg",
+        "at91sam7a2.cfg",
+        "at91sam7se512.cfg",
+        "at91sam7sx.cfg",
+        "at91sam7x256.cfg",
+        "at91sam7x512.cfg",
+        "at91sam9.cfg",
+        "at91sam9260.cfg",
+        "at91sam9260_ext_RAM_ext_flash.cfg",
+        "at91sam9261.cfg",
+        "at91sam9263.cfg",
+        "at91sam9g10.cfg",
+        "at91sam9g20.cfg",
+        "at91sam9g45.cfg",
+        "at91sam9rl.cfg",
+        "at91sama5d2.cfg",
+        "at91samdXX.cfg",
+        "at91samg5x.cfg",
+        "atheros_ar2313.cfg",
+        "atheros_ar2315.cfg",
+        "atheros_ar9331.cfg",
+        "atheros_ar9344.cfg",
+        "atmega128.cfg",
+        "atmega128rfa1.cfg",
+        "atmega32u4.cfg",
+        "atsame5x.cfg",
+        "atsaml1x.cfg",
+        "atsamv.cfg",
+        "avr32.cfg",
+        "bcm2711.cfg",
+        "bcm281xx.cfg",
+        "bcm2835.cfg",
+        "bcm2836.cfg",
+        "bcm2837.cfg",
+        "bcm4706.cfg",
+        "bcm4718.cfg",
+        "bcm47xx.cfg",
+        "bcm5352e.cfg",
+        "bcm6348.cfg",
+        "bluefield.cfg",
+        "bluenrg-x.cfg",
+        "c100.cfg",
+        "cc2538.cfg",
+        "cs351x.cfg",
+        "davinci.cfg",
+        "dragonite.cfg",
+        "dsp56321.cfg",
+        "dsp568013.cfg",
+        "dsp568037.cfg",
+        "efm32.cfg",
+        "em357.cfg",
+        "em358.cfg",
+        "eos_s3.cfg",
+        "epc9301.cfg",
+        "esi32xx.cfg",
+        "esp32.cfg",
+        "esp32s2.cfg",
+        "esp32s3.cfg",
+        "esp_common.cfg",
+        "exynos5250.cfg",
+        "faux.cfg",
+        "feroceon.cfg",
+        "fm3.cfg",
+        "fm4.cfg",
+        "fm4_mb9bf.cfg",
+        "fm4_s6e2cc.cfg",
+        "gd32e23x.cfg",
+        "gd32vf103.cfg",
+        "gp326xxxa.cfg",
+        "hi3798.cfg",
+        "hi6220.cfg",
+        "hilscher_netx10.cfg",
+        "hilscher_netx50.cfg",
+        "hilscher_netx500.cfg",
+        "icepick.cfg",
+        "imx.cfg",
+        "imx21.cfg",
+        "imx25.cfg",
+        "imx27.cfg",
+        "imx28.cfg",
+        "imx31.cfg",
+        "imx35.cfg",
+        "imx51.cfg",
+        "imx53.cfg",
+        "imx6.cfg",
+        "imx6sx.cfg",
+        "imx6ul.cfg",
+        "imx7.cfg",
+        "imx7ulp.cfg",
+        "imx8m.cfg",
+        "imx8qm.cfg",
+        "is5114.cfg",
+        "ixp42x.cfg",
+        "k1921vk01t.cfg",
+        "k40.cfg",
+        "k60.cfg",
+        "ke0x.cfg",
+        "ke1xf.cfg",
+        "ke1xz.cfg",
+        "kl25.cfg",
+        "kl46.cfg",
+        "klx.cfg",
+        "ks869x.cfg",
+        "kx.cfg",
+        "lpc11xx.cfg",
+        "lpc12xx.cfg",
+        "lpc13xx.cfg",
+        "lpc17xx.cfg",
+        "lpc1850.cfg",
+        "lpc1xxx.cfg",
+        "lpc2103.cfg",
+        "lpc2124.cfg",
+        "lpc2129.cfg",
+        "lpc2148.cfg",
+        "lpc2294.cfg",
+        "lpc2378.cfg",
+        "lpc2460.cfg",
+        "lpc2478.cfg",
+        "lpc2900.cfg",
+        "lpc2xxx.cfg",
+        "lpc3131.cfg",
+        "lpc3250.cfg",
+        "lpc40xx.cfg",
+        "lpc4350.cfg",
+        "lpc4357.cfg",
+        "lpc4370.cfg",
+        "lpc84x.cfg",
+        "lpc8nxx.cfg",
+        "lpc8xx.cfg",
+        "ls1012a.cfg",
+        "ls1028a.cfg",
+        "ls1046a.cfg",
+        "ls1088a.cfg",
+        "lsch3_common.cfg",
+        "max32620.cfg",
+        "max32625.cfg",
+        "max3263x.cfg",
+        "mc13224v.cfg",
+        "mdr32f9q2i.cfg",
+        "nds32v5.cfg",
+        "ngultra.cfg",
+        "nhs31xx.cfg",
+        "npcx.cfg",
+        "nrf51.cfg",
+        "nrf52.cfg",
+        "nuc910.cfg",
+        "numicro.cfg",
+        "numicro_m4.cfg",
+        "omap2420.cfg",
+        "omap3530.cfg",
+        "omap4430.cfg",
+        "omap4460.cfg",
+        "omap5912.cfg",
+        "omapl138.cfg",
+        "or1k.cfg",
+        "pic32mx.cfg",
+        "psoc4.cfg",
+        "psoc5lp.cfg",
+        "psoc6.cfg",
+        "pxa255.cfg",
+        "pxa270.cfg",
+        "pxa3xx.cfg",
+        "qn908x.cfg",
+        "qualcomm_qca4531.cfg",
+        "quark_d20xx.cfg",
+        "quark_x10xx.cfg",
+        "renesas_r7s72100.cfg",
+        "renesas_rcar_gen2.cfg",
+        "renesas_rcar_gen3.cfg",
+        "renesas_rcar_reset_common.cfg",
+        "renesas_rz_five.cfg",
+        "renesas_rz_g2.cfg",
+        "renesas_s7g2.cfg",
+        "rk3308.cfg",
+        "rk3399.cfg",
+        "rp2040.cfg",
+        "rsl10.cfg",
+        "samsung_s3c2410.cfg",
+        "samsung_s3c2440.cfg",
+        "samsung_s3c2450.cfg",
+        "samsung_s3c4510.cfg",
+        "samsung_s3c6410.cfg",
+        "sharp_lh79532.cfg",
+        "sim3x.cfg",
+        "smp8634.cfg",
+        "snps_em_sk_fpga.cfg",
+        "snps_hsdk.cfg",
+        "spear3xx.cfg",
+        "stellaris.cfg",
+        "stm32c0x.cfg",
+        "stm32f0x.cfg",
+        "stm32f1x.cfg",
+        "stm32f2x.cfg",
+        "stm32f3x.cfg",
+        "stm32f4x.cfg",
+        "stm32f7x.cfg",
+        "stm32g0x.cfg",
+        "stm32g4x.cfg",
+        "stm32h7x.cfg",
+        "stm32h7x_dual_bank.cfg",
+        "stm32l0.cfg",
+        "stm32l0_dual_bank.cfg",
+        "stm32l1.cfg",
+        "stm32l1x_dual_bank.cfg",
+        "stm32l4x.cfg",
+        "stm32l5x.cfg",
+        "stm32mp13x.cfg",
+        "stm32mp15x.cfg",
+        "stm32u5x.cfg",
+        "stm32w108xx.cfg",
+        "stm32wbx.cfg",
+        "stm32wlx.cfg",
+        "stm32x5x_common.cfg",
+        "stm32xl.cfg",
+        "stm8l.cfg",
+        "stm8l151x2.cfg",
+        "stm8l151x3.cfg",
+        "stm8l152.cfg",
+        "stm8l15xx4.cfg",
+        "stm8l15xx6.cfg",
+        "stm8l15xx8.cfg",
+        "stm8s.cfg",
+        "stm8s003.cfg",
+        "stm8s103.cfg",
+        "stm8s105.cfg",
+        "str710.cfg",
+        "str730.cfg",
+        "str750.cfg",
+        "str912.cfg",
+        "swm050.cfg",
+        "test_reset_syntax_error.cfg",
+        "test_syntax_error.cfg",
+        "ti-ar7.cfg",
+        "ti-cjtag.cfg",
+        "ti_calypso.cfg",
+        "ti_cc13x0.cfg",
+        "ti_cc13x2.cfg",
+        "ti_cc26x0.cfg",
+        "ti_cc26x2.cfg",
+        "ti_cc3220sf.cfg",
+        "ti_cc32xx.cfg",
+        "ti_dm355.cfg",
+        "ti_dm365.cfg",
+        "ti_dm6446.cfg",
+        "ti_k3.cfg",
+        "ti_msp432.cfg",
+        "ti_rm4x.cfg",
+        "ti_tms570.cfg",
+        "ti_tms570lc43xx.cfg",
+        "ti_tms570ls20xxx.cfg",
+        "ti_tms570ls3137.cfg",
+        "tmpa900.cfg",
+        "tmpa910.cfg",
+        "tnetc4401.cfg",
+        "u8500.cfg",
+        "vd_aarch64.cfg",
+        "vd_cortex_m.cfg",
+        "vd_riscv.cfg",
+        "vybrid_vf6xx.cfg",
+        "xilinx_zynqmp.cfg",
+        "xmc1xxx.cfg",
+        "xmc4xxx.cfg",
+        "xmos_xs1-xau8a-10_arm.cfg",
+        "xtensa-core-esp32.cfg",
+        "xtensa-core-esp32s2.cfg",
+        "xtensa-core-esp32s3.cfg",
+        "xtensa-core-nxp_rt600.cfg",
+        "xtensa-core-xt8.cfg",
+        "xtensa.cfg",
+        "zynq_7000.cfg",
+        "K1879xб1.cfg",
+        "tle987x.cfg",
+        "88f3710.cfg",
+        "88f3720.cfg",
+        "88f37x0.cfg"
+    };
+
+};

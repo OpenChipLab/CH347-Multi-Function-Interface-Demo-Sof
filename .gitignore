@@ -1,0 +1,51 @@
+# Visual Studio
+.vs/
+**/.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.aps
+*.VC.db
+*.VC.db-shm
+*.VC.db-wal
+*.ipch
+*.idb
+*.iobj
+*.ipdb
+
+# Build output (repository-root and legacy project-local output trees)
+/Debug/
+/Release/
+/x64/
+/x86/
+/ARM64/
+/obj/
+/Project1/Debug/
+/Project1/Release/
+/Project1/x64/
+/Project1/Project1/Debug/
+/Project1/Project1/Release/
+/Project1/Project1/x64/
+*.obj
+*.ilk
+*.pdb
+*.tlog
+*.lastbuildstate
+*.recipe
+*.log
+*.enc
+
+# Generated runtime configuration
+Cfg.INI
+imgui.ini
+
+# Local distribution copies and duplicate third-party packages
+/Project1/CH347_339W_Tool_Set/
+/SDL3_image-devel-3.2.4-VC/
+
+# Unused SDL3 binary variants (the bundled CH347 SDK is 32-bit)
+/SDL3/lib/arm64/
+/SDL3/lib/x64/
+/SDL3/lib/x86/optional/
+SDL3_test.lib
