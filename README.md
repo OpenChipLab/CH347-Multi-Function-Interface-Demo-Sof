@@ -18,11 +18,11 @@
 
 ## 软件界面
 
-![MainPage](pic\MainPage.png)
+![MainPage](pic/MainPage.png)
 
-![humiture](pic\humiture.gif)
+![humiture](pic/humiture.gif)
 
-![TFScreen](pic\TFScreen.png)
+![TFScreen](pic/TFScreen.png)
 
 ## 环境要求
 
