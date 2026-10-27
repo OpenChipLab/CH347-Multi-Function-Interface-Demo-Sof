@@ -2,6 +2,10 @@
 
 基于 CH347 高速 USB 转接芯片的 Windows 桌面演示工具，使用 Dear ImGui、ImPlot 与 SDL3 构建。仓库包含完整源码、构建脚本所需依赖以及运行 OpenOCD、XVCD 和 TFT 演示所需的资源文件。
 
+详细介绍可参考：
+
+> [https://blog.csdn.net/qq_43010294/article/details/158005191](https://blog.csdn.net/qq_43010294/article/details/158005191)
+
 ## 功能
 
 - **I2C 温湿度采集**：读取 SHT2x/SHT3x 系列传感器数据并进行实时显示。
@@ -11,6 +15,14 @@
 - **内嵌帮助文档**：应用内说明与 `doc/help.pdf` 用户手册。
 
 > FPGA 下载调试与 MCU 下载使用同一组 JTAG/SWD 资源，不能同时运行。
+
+## 软件界面
+
+![MainPage](pic\MainPage.png)
+
+![humiture](pic\humiture.gif)
+
+![TFScreen](pic\TFScreen.png)
 
 ## 环境要求
 
